@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# create the development environment for home-assistant with FranklinWH integration
+set -euo pipefail
+
+if [ $# -gt 0 ]; then
+  BRANCH="$1"
+else
+  read -r -p "Enter git branch name: " BRANCH
+fi
+
+declare -A repo=([core]=https://github.com/home-assistant/core [franklinwh-python]=https://github.com/richo/franklinwh-python [franklin_wh]=https://github.com/richo/homeassistant-franklinwh)
+
+for d in core config/deps/franklinwh-python config/custom_components/franklin_wh; do
+  if [ "$d" = core ]; then
+    gh repo fork "${repo[${d##*/}]}" --clone --default-branch-only
+    pushd "$d"
+    git switch dev
+    pushd .
+  else
+    git submodule add -f -b main "${repo[${d##*/}]}" "$d"
+    pushd "$d"
+    gh repo fork --remote
+  fi
+  git fetch origin
+  git switch -c "$BRANCH"
+  popd
+done
