@@ -8,16 +8,25 @@ else
   read -r -p "Enter git branch name: " BRANCH
 fi
 
+declare repo=(
+  "core https://github.com/home-assistant/core"
 declare -A repo=([core]=https://github.com/home-assistant/core [franklinwh-python]=https://github.com/richo/franklinwh-python [franklin_wh]=https://github.com/richo/homeassistant-franklinwh)
+  "config/deps/franklinwh-python https://github.com/richo/franklinwh-python"
+  "config/custom_components/franklin_wh https://github.com/richo/homeassistant-franklinwh"
+)
 
-for d in core config/deps/franklinwh-python config/custom_components/franklin_wh; do
+for x in "${repo[@]}"; do
+  # shellcheck disable=SC2206
+  sub=($x)
+  d="${sub[0]}"
+  url="${sub[1]}"
   if [ "$d" = core ]; then
-    gh repo fork "${repo[${d##*/}]}" --clone --default-branch-only
+    gh repo fork "$url" --clone --default-branch-only
     pushd "$d"
     git switch dev
     pushd .
   else
-    git submodule add -f -b main "${repo[${d##*/}]}" "$d"
+    git submodule add -f -b main "$url" "$d"
     pushd "$d"
     gh repo fork --remote
   fi
