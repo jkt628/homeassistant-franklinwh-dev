@@ -10,7 +10,8 @@ fi
 
 declare repo=(
   "core https://github.com/home-assistant/core"
-declare -A repo=([core]=https://github.com/home-assistant/core [franklinwh-python]=https://github.com/richo/franklinwh-python [franklin_wh]=https://github.com/richo/homeassistant-franklinwh)
+  "config/deps/franklinwh-direct-or-cloud https://github.com/jkt628/franklinwh-direct-or-cloud"
+  "config/deps/franklinwh-direct-connect-api https://github.com/david2069/franklinwh-direct-connect-api"
   "config/deps/franklinwh-python https://github.com/richo/franklinwh-python"
   "config/custom_components/franklin_wh https://github.com/richo/homeassistant-franklinwh"
 )
@@ -28,7 +29,7 @@ for x in "${repo[@]}"; do
   else
     git submodule add -f -b main "$url" "$d"
     pushd "$d"
-    gh repo fork --remote
+    gh repo fork --remote ||:
   fi
   git fetch origin
   git switch -c "$BRANCH"
